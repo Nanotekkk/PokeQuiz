@@ -19,8 +19,8 @@
 ### 2. Quelles versions de Kotlin, Compose Multiplatform, AGP et Gradle sont utilisées ?
 - **Kotlin** : `2.4.20` (déclaré dans [gradle/libs.versions.toml](file:///C:/Users/mathe/Desktop/PokeQuiz/gradle/libs.versions.toml#L13))
 - **Compose Multiplatform** : `1.12.1` (déclaré dans [gradle/libs.versions.toml](file:///C:/Users/mathe/Desktop/PokeQuiz/gradle/libs.versions.toml#L11))
-- **AGP (Android Gradle Plugin)** : `9.1.1` (déclaré dans [gradle/libs.versions.toml](file:///C:/Users/mathe/Desktop/PokeQuiz/gradle/libs.versions.toml#L2))
-- **Gradle** : `9.5.1` (Gradle Wrapper)
+- **AGP (Android Gradle Plugin)** : `9.4.1` (déclaré dans [gradle/libs.versions.toml](file:///C:/Users/mathe/Desktop/PokeQuiz/gradle/libs.versions.toml#L2))
+- **Gradle** : `9.6.0` (Gradle Wrapper)
 
 ### 3. Quels plugins applique `shared/build.gradle.kts` ? Et `androidApp/build.gradle.kts` ? Pourquoi `androidApp` n'applique-t-il pas `org.jetbrains.kotlin.android` ?
 - **Dans `shared/build.gradle.kts`** :
