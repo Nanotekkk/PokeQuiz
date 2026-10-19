@@ -1,142 +1,128 @@
 # Lab 1 : Setup, Exploration et Écran d'accueil PokéQuiz
 
-**Package / Group ID** : `fr.m2.pokequiz`  
-**Projet** : `PokeQuiz` (Kotlin Multiplatform : Android, Desktop, iOS)
+**Package** : `fr.m2.pokequiz`  
+**Projet** : `PokeQuiz` (Android, Desktop, iOS)
 
 ---
 
-## Étape 5 — Questions d'exploration de l'arborescence
+## Étape 5 — Exploration de l'arborescence
 
 ### 1. Combien de modules Gradle contient le projet ? Lesquels ? Où sont-ils déclarés ? `iosApp` en fait-il partie ? Pourquoi ?
-- **Nombre de modules** : 3 modules Gradle.
-- **Liste des modules** :
-  - `:androidApp` (Application Android)
-  - `:desktopApp` (Application Desktop JVM)
-  - `:shared` (Bibliothèque Kotlin Multiplatform partagée)
-- **Fichier de déclaration** : [settings.gradle.kts](file:///C:/Users/mathe/Desktop/PokeQuiz/settings.gradle.kts) via les lignes `include(":androidApp")`, `include(":desktopApp")`, `include(":shared")`.
-- **`iosApp`** : Non, `iosApp` ne fait pas partie des modules Gradle. Il s'agit d'un projet Xcode natif (`iosApp.xcodeproj`). La compilation iOS est pilotée par Xcode, qui fait appel au binaire/framework Kotlin généré par le module Gradle `:shared` via un script d'intégration.
+- Il y a **3 modules Gradle** :
+  - `:androidApp` (l'application Android)
+  - `:desktopApp` (l'application Desktop)
+  - `:shared` (le code partagé)
+- Ils sont déclarés dans `settings.gradle.kts` avec `include(":androidApp")`, `include(":desktopApp")`, `include(":shared")`.
+- **`iosApp` n'en fait pas partie** : C'est un projet Xcode natif (`.xcodeproj`). Il est géré par Xcode, qui utilise le framework généré par Gradle lors du build.
 
 ### 2. Quelles versions de Kotlin, Compose Multiplatform, AGP et Gradle sont utilisées ?
-- **Kotlin** : `2.4.20` (déclaré dans [gradle/libs.versions.toml](file:///C:/Users/mathe/Desktop/PokeQuiz/gradle/libs.versions.toml#L13))
-- **Compose Multiplatform** : `1.12.1` (déclaré dans [gradle/libs.versions.toml](file:///C:/Users/mathe/Desktop/PokeQuiz/gradle/libs.versions.toml#L11))
-- **AGP (Android Gradle Plugin)** : `9.4.1` (déclaré dans [gradle/libs.versions.toml](file:///C:/Users/mathe/Desktop/PokeQuiz/gradle/libs.versions.toml#L2))
-- **Gradle** : `9.6.0` (Gradle Wrapper)
+- **Kotlin** : `2.4.20`
+- **Compose Multiplatform** : `1.12.1`
+- **AGP (Android Gradle Plugin)** : `9.4.1`
+- **Gradle** : `9.6.0`  
+*(Toutes ces versions sont définies dans `gradle/libs.versions.toml` et `gradle-wrapper.properties`)*.
 
 ### 3. Quels plugins applique `shared/build.gradle.kts` ? Et `androidApp/build.gradle.kts` ? Pourquoi `androidApp` n'applique-t-il pas `org.jetbrains.kotlin.android` ?
 - **Dans `shared/build.gradle.kts`** :
-  - `alias(libs.plugins.kotlinMultiplatform)` (`org.jetbrains.kotlin.multiplatform`)
-  - `alias(libs.plugins.androidMultiplatformLibrary)` (`com.android.kotlin.multiplatform.library`)
-  - `alias(libs.plugins.composeMultiplatform)` (`org.jetbrains.compose`)
-  - `alias(libs.plugins.composeCompiler)` (`org.jetbrains.kotlin.plugin.compose`)
+  - `kotlinMultiplatform`
+  - `androidMultiplatformLibrary`
+  - `composeMultiplatform`
+  - `composeCompiler`
 - **Dans `androidApp/build.gradle.kts`** :
-  - `alias(libs.plugins.androidApplication)` (`com.android.application`)
-  - `alias(libs.plugins.composeCompiler)` (`org.jetbrains.kotlin.plugin.compose`)
-- **Pourquoi `androidApp` n'applique pas `org.jetbrains.kotlin.android`** :
-  Avec AGP 9 et la nouvelle architecture Kotlin Multiplatform, le code applicatif et les composants Compose se situent dans le module `:shared`. Le module `:androidApp` est un runner natif léger appliquant `com.android.application` et dépendant du module `:shared`.
+  - `androidApplication`
+  - `composeCompiler`
+- **Pourquoi `androidApp` n'utilise pas `kotlin.android`** :
+  Parce que tout le code Kotlin et l'UI Compose sont centralisés dans le module `:shared`. Le module `:androidApp` sert juste de lanceur pour Android et applique `com.android.application`.
 
-### 4. Où sont configurés le `minSdk` de la bibliothèque partagée et celui de l'application ? Sous quelle forme (valeur en dur ou catalog) ?
-- Configuré sous forme de **Version Catalog** dans [gradle/libs.versions.toml](file:///C:/Users/mathe/Desktop/PokeQuiz/gradle/libs.versions.toml#L3) avec `android-minSdk = "36"`.
-- Référencé dans :
-  - [shared/build.gradle.kts](file:///C:/Users/mathe/Desktop/PokeQuiz/shared/build.gradle.kts#L28) : `minSdk = libs.versions.android.minSdk.get().toInt()`
-  - [androidApp/build.gradle.kts](file:///C:/Users/mathe/Desktop/PokeQuiz/androidApp/build.gradle.kts#L27) : `minSdk = libs.versions.android.minSdk.get().toInt()`
+### 4. Où sont configurés le `minSdk` de la bibliothèque partagée et celui de l'application ? Sous quelle forme ?
+- Il est défini dans le **Version Catalog** (`gradle/libs.versions.toml`) sous `android-minSdk = "36"`.
+- Il est ensuite récupéré dans `shared/build.gradle.kts` et `androidApp/build.gradle.kts` avec `minSdk = libs.versions.android.minSdk.get().toInt()`.
 
 ### 5. Listez les dossiers de `shared/src/`. Pourquoi n'y a-t-il pas de `iosArm64Main` alors que la cible `iosArm64()` est déclarée ?
-- **Dossiers dans `shared/src/`** : `commonMain`, `commonTest`, `androidMain`, `androidHostTest`, `jvmMain`, `jvmTest`, `iosMain`, `iosTest`.
-- **Explication pour `iosArm64Main`** : Grâce au mécanisme de *Default Kotlin Hierarchy Template*, Kotlin regroupe automatiquement les cibles iOS (`iosArm64()` et `iosSimulatorArm64()`) sous un sourceSet partagé intermédiaire nommé `iosMain`. Tout le code spécifique à iOS est ainsi centralisé dans `iosMain`.
+- **Dossiers présents** : `commonMain`, `commonTest`, `androidMain`, `androidHostTest`, `jvmMain`, `jvmTest`, `iosMain`, `iosTest`.
+- **Explication pour `iosArm64Main`** : Kotlin regroupe automatiquement les différentes cibles iOS (`iosArm64()` et `iosSimulatorArm64()`) dans un seul dossier parent `iosMain`. On écrit donc tout le code iOS dans `iosMain`.
 
 ### 6. Où est déclarée `expect fun getPlatform()` ? Combien d'`actual` existe-t-il, et dans quels fichiers ?
-- **Déclaration `expect`** : [shared/src/commonMain/kotlin/fr/m2/pokequiz/Platform.kt](file:///C:/Users/mathe/Desktop/PokeQuiz/shared/src/commonMain/kotlin/fr/m2/pokequiz/Platform.kt)
-- **3 implémentations `actual`** :
-  1. [shared/src/androidMain/kotlin/fr/m2/pokequiz/Platform.android.kt](file:///C:/Users/mathe/Desktop/PokeQuiz/shared/src/androidMain/kotlin/fr/m2/pokequiz/Platform.android.kt) (Android)
-  2. [shared/src/jvmMain/kotlin/fr/m2/pokequiz/Platform.jvm.kt](file:///C:/Users/mathe/Desktop/PokeQuiz/shared/src/jvmMain/kotlin/fr/m2/pokequiz/Platform.jvm.kt) (Desktop / JVM)
-  3. [shared/src/iosMain/kotlin/fr/m2/pokequiz/Platform.ios.kt](file:///C:/Users/mathe/Desktop/PokeQuiz/shared/src/iosMain/kotlin/fr/m2/pokequiz/Platform.ios.kt) (iOS)
+- **`expect`** : déclarée dans `shared/src/commonMain/kotlin/fr/m2/pokequiz/Platform.kt`.
+- **3 `actual`** :
+  1. `Platform.android.kt` (dans `androidMain`)
+  2. `Platform.jvm.kt` (dans `jvmMain`)
+  3. `Platform.ios.kt` (dans `iosMain`)
 
 ### 7. Quel est l'`applicationId` Android ? Quelle est la `mainClass` desktop, et pourquoi se termine-t-elle par `Kt` ?
-- **`applicationId` Android** : `fr.m2.pokequiz` (dans [androidApp/build.gradle.kts](file:///C:/Users/mathe/Desktop/PokeQuiz/androidApp/build.gradle.kts#L26))
-- **`mainClass` Desktop** : `fr.m2.pokequiz.MainKt` (dans [desktopApp/build.gradle.kts](file:///C:/Users/mathe/Desktop/PokeQuiz/desktopApp/build.gradle.kts#L20))
-- **Explication de la terminaison `Kt`** : En Kotlin, les fonctions top-level (telle que `fun main()`) déclarées dans un fichier `main.kt` sont compilées par la JVM dans une classe Java générée automatiquement nommée `<NomDuFichier>Kt` (soit `MainKt`).
+- **`applicationId` Android** : `fr.m2.pokequiz` (dans `androidApp/build.gradle.kts`).
+- **`mainClass` Desktop** : `fr.m2.pokequiz.MainKt` (dans `desktopApp/build.gradle.kts`).
+- **Pourquoi la terminaison `Kt`** : La fonction `main()` est déclarée hors d'une classe dans `main.kt`. Le compilateur Kotlin génère donc automatiquement une classe Java nommée `MainKt`.
 
 ### 8. Où la fonction `App()` est-elle définie ? Depuis combien d'endroits est-elle appelée, et lesquels ?
-- **Définition** : [shared/src/commonMain/kotlin/fr/m2/pokequiz/App.kt](file:///C:/Users/mathe/Desktop/PokeQuiz/shared/src/commonMain/kotlin/fr/m2/pokequiz/App.kt)
-- **3 points d'entrée d'exécution principaux** :
-  1. Android : [androidApp/src/main/kotlin/fr/m2/pokequiz/MainActivity.kt](file:///C:/Users/mathe/Desktop/PokeQuiz/androidApp/src/main/kotlin/fr/m2/pokequiz/MainActivity.kt) (`setContent { App() }`)
-  2. Desktop : [desktopApp/src/main/kotlin/fr/m2/pokequiz/main.kt](file:///C:/Users/mathe/Desktop/PokeQuiz/desktopApp/src/main/kotlin/fr/m2/pokequiz/main.kt) (`Window { App() }`)
-  3. iOS : [shared/src/iosMain/kotlin/fr/m2/pokequiz/MainViewController.kt](file:///C:/Users/mathe/Desktop/PokeQuiz/shared/src/iosMain/kotlin/fr/m2/pokequiz/MainViewController.kt) (`ComposeUIViewController { App() }`)
+- **Définie dans** : `shared/src/commonMain/kotlin/fr/m2/pokequiz/App.kt`.
+- **Appelée depuis 3 endroits** :
+  1. Android : `MainActivity.kt` (`setContent { App() }`)
+  2. Desktop : `main.kt` (`Window { App() }`)
+  3. iOS : `MainViewController.kt` (`ComposeUIViewController { App() }`)
 
 ### 9. Que contient le `.gitignore` généré ? Pourquoi `local.properties` doit-il être ignoré ?
-- Contient les répertoires de compilation et caches d'environnement : `.gradle/`, `build/`, `local.properties`, `.idea/`, `.kotlin/`, `*.iml`, `xcuserdata/`.
-- **Pourquoi `local.properties` doit être ignoré** : Il contient les chemins d'accès locaux propres à la machine (ex: `sdk.dir`) et parfois des identifiants/clés locales. Le versionner provoquerait des conflits entre développeurs et sur les serveurs d'intégration continue (CI).
+- Il contient les dossiers générés par le build et l'IDE (`build/`, `.gradle/`, `.idea/`, `.kotlin/`, `local.properties`, etc.).
+- `local.properties` doit être ignoré car il contient les chemins d'accès propres à l'ordinateur du développeur (comme le chemin du SDK Android local).
 
 ### 10. Dans `shared/src/commonMain/.../App.kt`, ajoutez temporairement `val f = java.io.File("x")` dans `App()`. Que dit l'IDE ? Pourquoi ?
-- **Message IDE** : Erreur de compilation : *Unresolved reference 'java'*.
-- **Explication** : Le code du sourceSet `commonMain` est destiné à être compilé pour toutes les plateformes (dont iOS / Native). Les classes du JDK Java comme `java.io.File` ne sont disponibles que sur la JVM et sont absentes sur iOS. Le code commun ne doit utiliser que la bibliothèque standard Kotlin ou des bibliothèques multiplateformes.
+- **Erreur de l'IDE** : `Unresolved reference: java`.
+- **Pourquoi** : Le dossier `commonMain` doit pouvoir être compilé sur toutes les plateformes, y compris iOS. Or `java.io.File` fait partie du JDK Java et n'existe pas sur iOS.
 
 ---
 
 ## Étape 7 — Observations Compose Hot Reload
 
-1. **Modifications à chaud (UI et Libellé)** :
-   - En modifiant le texte du bouton ou le style de fond (`Modifier.background(...)`), la modification est appliquée en temps réel sur la fenêtre Desktop sans redémarrage du processus et sans perte de l'état du compteur.
-2. **Impact du renommage de `main` ou de l'ajout d'une dépendance Gradle** :
-   - Modifier la signature / le nom de la fonction d'entrée `main()` ou altérer la configuration des dépendances Gradle détruit le contexte de rechargement à chaud et nécessite un redémarrage complet de l'application (`:desktopApp:run`).
+1. **Modifications d'UI (libellé, couleur)** : Le Hot Reload applique les changements directement sur l'application Desktop sans la redémarrer et sans réinitialiser la valeur du compteur.
+2. **Renommage de `main` ou ajout de dépendances** : Modifier le point d'entrée ou ajouter une dépendance dans Gradle nécessite un redémarrage complet du projet.
 
 ---
 
-## Étape 8 — Écran d'accueil PokéQuiz (Implémentation)
+## Étape 8 — Écran d'accueil PokéQuiz
 
-- **`Greeting.kt`** : Retourne `"Bonjour depuis ${platform.name}"`.
-- **`Platform.jvm.kt`** : Retourne `"Desktop (${System.getProperty("os.name")}) · Java ${System.getProperty("java.version")}"`.
+- **`Greeting.kt`** : Modifié pour retourner `"Bonjour depuis ${platform.name}"`.
+- **`Platform.jvm.kt`** : Mis à jour pour retourner `"Desktop (${System.getProperty("os.name")}) · Java ${System.getProperty("java.version")}"`.
 - **`App.kt`** :
-  - Composant `Column` centré horizontalement et verticalement (`safeContentPadding()`, espacement de 16.dp).
-  - Titre `"Bienvenue dans PokéQuiz"` avec le style `MaterialTheme.typography.headlineMedium`.
-  - Texte affichant le résultat de `Greeting().greet()`.
-  - Bouton Material 3 modifiant un état `remember { mutableIntStateOf(0) }` affichant `"Compteur : $count"`.
+  - `Column` centrée avec espacement de `16.dp` et `safeContentPadding()`.
+  - Titre `"Bienvenue dans PokéQuiz"` en `headlineMedium`.
+  - Texte de salutation `Greeting().greet()`.
+  - Bouton Material 3 incrémentant un état `count` (`remember { mutableIntStateOf(0) }`) et affichant `"Compteur : $count"`.
 
 ---
 
-## Questions de réflexion et d'analyse (Fin de TP)
+## Questions de réflexion (Fin de TP)
 
 ### 1. Pourquoi est-il intéressant de développer l'UI sur la cible Desktop même si le produit final est une app mobile ?
-- **Lancement instantané** : La cible Desktop démarre directement sur la JVM sans le surcoût de démarrage et d'émulation matérielle d'un émulateur Android ou d'un simulateur iOS.
-- **Compose Hot Reload** : Permet de voir les modifications graphiques et d'ergonomie en temps réel sans perdre l'état courant de l'écran.
-- **Sobriété en ressources** : Économise la mémoire RAM et les ressources CPU de la machine de développement.
+C'est beaucoup plus rapide à lancer qu'un émulateur Android ou un simulateur iOS, ça consomme moins de RAM/CPU sur le PC, et le Hot Reload permet de tester l'UI instantanément.
 
 ### 2. Quelle différence faites-vous entre un Hot Reload et un redémarrage ? Quels changements ont nécessité un redémarrage complet à l'étape 7 ?
-- **Hot Reload** : Injecte le nouveau bytecode / représentation intermédiaire directement dans la JVM en cours d'exécution sans stopper le processus ni réinitialiser la mémoire ou l'état de l'UI.
-- **Redémarrage** : Relance le processus depuis son point d'entrée `main()`, réinitialisant toutes les variables d'état et re-compilant le projet.
-- **Changements nécessitant un redémarrage** : Renommage du point d'entrée `main()`, modification des dépendances Gradle, ou modification structurelle de bas niveau.
+- **Hot Reload** : Injecte les modifications de code dans l'application en cours d'exécution en gardant l'état de l'écran.
+- **Redémarrage** : Ferme l'application et la relance depuis le début (l'état est perdu).
+- Modifier la fonction `main()` ou le fichier `build.gradle.kts` a nécessité un redémarrage.
 
 ### 3. Que se passerait-il si quelqu'un ajoute dans `shared/build.gradle.kts` un bloc `androidTarget { }` trouvé dans un tutoriel de 2023 ?
-- La compilation du script de build échouera (`Unresolved reference: androidTarget`).
-- **Raison** : Avec le plugin AGP 9 (`com.android.kotlin.multiplatform.library`), la cible Android du module partagé s'exprime désormais par le bloc `android { ... }`. Le bloc `androidTarget { }` appartient à une ancienne révision du plugin KMP.
+Il y aura une erreur Gradle à la compilation (`Unresolved reference: androidTarget`), car avec les versions récentes d'AGP 9, on utilise maintenant le bloc `android { ... }`.
 
 ### 4. Le texte « Hello/Bonjour depuis ... » est différent sur chaque plateforme alors que `Greeting` est en code commun. Expliquez le mécanisme.
-- Ce mécanisme repose sur le mot-clé **`expect` / `actual`** de Kotlin Multiplatform.
-- `commonMain` définit la fonction `expect fun getPlatform(): Platform`.
-- Chaque plateforme cible fournit sa propre implémentation `actual fun getPlatform(): Platform` (`AndroidPlatform`, `JVMPlatform`, `IOSPlatform`) qui fournit des informations spécifiques à son OS.
+`Greeting` appelle `getPlatform()`, qui est déclarée avec le mot-clé `expect` dans `commonMain`. Chaque plateforme fournit ensuite sa version `actual` avec ses propres informations système (Android, Desktop, iOS).
 
 ### 5. Le même `Greeting` est compilé en DEX (Android), en bytecode JVM (desktop) et en binaire natif (iOS). Selon vous, laquelle de ces formes est la plus facile à déboguer ou à décompiler pour un auditeur de sécurité ? Pourquoi ? Quels mécanismes peuvent rendre le code commun sensible dans `commonMain` plus difficile à analyser ?
-- **Formes les plus faciles à décompiler** : Le bytecode JVM et le DEX Android. Ils conservent la structure des métadonnées des méthodes et classes, permettant à des outils comme JADX d'extraire du code proche du source d'origine.
-- **Binaire natif iOS** : Compilé en binaire machine ARM64 via LLVM, il est plus complexe à analyser (nécessite un désassembleur natif comme Ghidra ou IDA Pro).
-- **Protection du code sensible** :
-  - Utilisation de l'obfuscation / minification R8/ProGuard sur Android et Desktop.
-  - Stripping des symboles de débogage et obfuscation de symboles pour Kotlin/Native.
-  - Éviter de stocker des clés secrètes ou de la logique métier critique directement en clair dans le code source commun.
+- **Le DEX et le bytecode JVM** sont les plus faciles à décompiler (avec des outils comme JADX) car ils conservent la structure du code source.
+- **Le binaire natif iOS** est plus difficile car il est compilé en code binaire machine ARM64.
+- Pour protéger le code, on peut utiliser des outils d'obfuscation comme ProGuard/R8.
 
 ### 6. Tâches Gradle liées à l'exécution (`./gradlew tasks --all | grep -i run`)
 - Exécution Desktop : `./gradlew :desktopApp:run`
 - Hot Reload Desktop : `./gradlew :desktopApp:hotRun`
-- Installation/Exécution Android : `./gradlew :androidApp:installDebug`
+- Android : `./gradlew :androidApp:installDebug`
 
 ### 7. Sorties de compilation dans `shared/build/`
-- **Fichiers `.class`** : Situés dans `shared/build/classes/kotlin/jvm/main/` pour la cible JVM.
-- **Fichiers `.klib`** : Situés dans `shared/build/classes/kotlin/metadata/` ou `shared/build/libs/`.
-- **Rôle des `.klib`** : Ce sont les archives binaires intermédiaires Kotlin Multiplatform contenant l'IR (Intermediate Representation) et les métadonnées nécessaires à la résolution d'API multiplateformes pour les cibles non-JVM (iOS/Native) et `commonMain`.
+- Les fichiers `.class` sont dans `shared/build/classes/kotlin/jvm/main/`.
+- Les fichiers `.klib` sont les bibliothèques intermédiaires Kotlin Multiplatform contenant les métadonnées pour le code commun et iOS.
 
 ### 8. Arbre de dépendances runtime Desktop et bibliothèque Skiko
 - Commande : `./gradlew :shared:dependencies --configuration jvmRuntimeClasspath`
-- **Bibliothèque Skiko** : `org.jetbrains.skiko:skiko-awt-runtime-windows-x64` (ou équivalent selon l'OS).
-- **Rôle** : Skiko (Skia for Kotlin) est le moteur de rendu 2D sur lequel repose Compose Multiplatform pour dessiner directement les composants UI Canvas sur Desktop et iOS via la bibliothèque graphique Skia.
+- **Skiko** (`skiko-awt-runtime-...`) apparaît car c'est la bibliothèque graphique basée sur Skia qui permet à Compose de dessiner l'interface sur Desktop.
 
 ### 9. Preflight checks
-- L'outil de Preflight Checks vérifie l'état de santé du poste de développement (versions du JDK 17/21, installation d'Android SDK, variables d'environnement `ANDROID_HOME`, et Xcode sur macOS).
+L'outil Preflight Checks permet de vérifier si l'environnement de dev (JDK, Android SDK, Xcode) est bien configuré.
