@@ -1,4 +1,4 @@
-# Réponses au Lab 2 — Le domaine du quiz en code partagé
+# Lab 2 — Le domaine du quiz en code partagé
 
 ### 1. Pourquoi ne peut-on pas utiliser `java.text.Normalizer` directement dans `commonMain` ?
 Le code situé dans `commonMain` est destiné à être compilé pour toutes les cibles du projet, y compris iOS (qui compile en binaire natif et n'a pas accès au JDK Java). Comme `java.text.Normalizer` appartient à la bibliothèque standard Java (`java.*`), le compilateur Kotlin interdit son utilisation dans `commonMain` afin de garantir que le code partagé reste 100% multiplateforme.
