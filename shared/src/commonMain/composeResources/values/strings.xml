@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">PokéQuiz</string>
+    <string name="home_subtitle">Devine le Pokémon caché !</string>
+    <string name="home_quiz">Jouer au quiz</string>
+    <string name="home_pokedex">Pokédex</string>
+    <string name="home_leaderboard">Classement</string>
+
+    <string name="back">Retour</string>
+    <string name="loading">Chargement...</string>
+    <string name="pokedex_title">Pokédex</string>
+    <string name="detail_title">Fiche Pokémon</string>
+    <string name="quiz_title">Quiz</string>
+    <string name="leaderboard_title">Classement</string>
+
+    <string name="pokemon_number">N°%1$d</string>
+    <string name="detail_types">Types</string>
+    <string name="mystery_pokemon">Pokémon mystère</string>
+    <string name="pokemon_artwork">Illustration officielle du Pokémon</string>
+    <string name="question_progress">Question %1$d / %2$d</string>
+    <string name="answer_label">Nom français</string>
+    <string name="hint_button">Indice</string>
+    <string name="hint_label">Indice : %1$s</string>
+    <string name="submit">Valider</string>
+    <string name="elapsed_label">Temps : %1$s</string>
+
+    <string name="reveal_correct">Bravo !</string>
+    <string name="reveal_wrong">Raté...</string>
+    <string name="reveal_answer">C’était %1$s !</string>
+    <string name="reveal_your_answer">Ta réponse : %1$s</string>
+    <string name="reveal_hint_used">Indice utilisé</string>
+    <string name="total_score">Total : %1$s</string>
+    <string name="next_question">Question suivante</string>
+    <string name="see_results">Voir le résultat</string>
+
+    <string name="pseudo_title">Partie terminée !</string>
+    <string name="pseudo_label">Ton pseudo</string>
+    <string name="pseudo_save">Enregistrer</string>
+    <string name="pseudo_error_blank">Le pseudo ne peut pas être vide</string>
+    <string name="pseudo_error_length">Le pseudo doit faire 12 caractères maximum</string>
+    <string name="total_time">Temps total : %1$s</string>
+
+    <string name="leaderboard_empty">Aucune partie pour l’instant</string>
+    <string name="leaderboard_rank">Rang</string>
+    <string name="leaderboard_pseudo">Pseudo</string>
+    <string name="leaderboard_points">Points</string>
+    <string name="leaderboard_time">Temps</string>
+
+    <plurals name="points">
+        <item quantity="one">%1$d point</item>
+        <item quantity="other">%1$d points</item>
+    </plurals>
+    <plurals name="points_gained">
+        <item quantity="one">+%1$d point</item>
+        <item quantity="other">+%1$d points</item>
+    </plurals>
+</resources>

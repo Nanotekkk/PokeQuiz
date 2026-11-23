@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">PokéQuiz</string>
+    <string name="home_subtitle">Guess the hidden Pokémon!</string>
+    <string name="home_quiz">Play Quiz</string>
+    <string name="home_pokedex">Pokédex</string>
+    <string name="home_leaderboard">Leaderboard</string>
+
+    <string name="back">Back</string>
+    <string name="loading">Loading...</string>
+    <string name="pokedex_title">Pokédex</string>
+    <string name="detail_title">Pokémon Info</string>
+    <string name="quiz_title">Quiz</string>
+    <string name="leaderboard_title">Leaderboard</string>
+
+    <string name="pokemon_number">#%1$d</string>
+    <string name="detail_types">Types</string>
+    <string name="mystery_pokemon">Mystery Pokémon</string>
+    <string name="pokemon_artwork">Official Pokémon artwork</string>
+    <string name="question_progress">Question %1$d / %2$d</string>
+    <string name="answer_label">French name</string>
+    <string name="hint_button">Hint</string>
+    <string name="hint_label">Hint: %1$s</string>
+    <string name="submit">Submit</string>
+    <string name="elapsed_label">Time: %1$s</string>
+
+    <string name="reveal_correct">Great job!</string>
+    <string name="reveal_wrong">Wrong...</string>
+    <string name="reveal_answer">It was %1$s!</string>
+    <string name="reveal_your_answer">Your answer: %1$s</string>
+    <string name="reveal_hint_used">Hint used</string>
+    <string name="total_score">Total: %1$s</string>
+    <string name="next_question">Next question</string>
+    <string name="see_results">See results</string>
+
+    <string name="pseudo_title">Game over!</string>
+    <string name="pseudo_label">Your nickname</string>
+    <string name="pseudo_save">Save</string>
+    <string name="pseudo_error_blank">Nickname cannot be blank</string>
+    <string name="pseudo_error_length">Nickname must be 12 characters max</string>
+    <string name="total_time">Total time: %1$s</string>
+
+    <string name="leaderboard_empty">No games played yet</string>
+    <string name="leaderboard_rank">Rank</string>
+    <string name="leaderboard_pseudo">Nickname</string>
+    <string name="leaderboard_points">Points</string>
+    <string name="leaderboard_time">Time</string>
+
+    <plurals name="points">
+        <item quantity="one">%1$d point</item>
+        <item quantity="other">%1$d points</item>
+    </plurals>
+    <plurals name="points_gained">
+        <item quantity="one">+%1$d point</item>
+        <item quantity="other">+%1$d points</item>
+    </plurals>
+</resources>
